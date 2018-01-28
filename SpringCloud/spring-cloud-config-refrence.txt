@@ -1,0 +1,124 @@
+Spring Cloud Config Properties:
+-------------------------------
+
+Server:
+=======
+
+dependencies:
+-------------
+    <dependency>
+      <groupId>org.springframework.boot</groupId>
+      <artifactId>spring-boot-starter-actuator</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.springframework.boot</groupId>
+      <artifactId>spring-boot-actuator-docs</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.springframework.cloud</groupId>
+      <artifactId>spring-cloud-config-server</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.springframework.boot</groupId>
+      <artifactId>spring-boot-starter-security</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.springframework.boot</groupId>
+      <artifactId>spring-boot-starter-web</artifactId>
+    </dependency>
+
+    <!-- for cloud bus -->
+
+    <dependency>
+      <groupId>org.springframework.cloud</groupId>
+      <artifactId>spring-cloud-config-monitor</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.springframework.cloud</groupId>
+      <artifactId>spring-cloud-starter-stream-rabbit</artifactId>
+    </dependency>
+    
+server.port=8888
+spring.application.name=config-server
+#spring.cloud.config.server.git.uri=file://${user.home}/config-repo #(Local Git Repo Path)
+spring.cloud.config.server.git.uri=https://github.com/spring-cloud-samples/config-repo #(Remote URL)
+spring.cloud.config.server.git.searchPaths=foo,bar*
+spring.cloud.config.server.git.username=naresh
+spring.cloud.config.server.git.password=naresh
+spring.cloud.config.server.git.force-pull=true
+
+#LocalFileSystem
+spring.cloud.config.server.native.searchLocations=file:///${user.home}/config-repo
+spring.profiles.active=native
+
+#Property Overrides
+spring.cloud.config.server.overrides.{any property name}={any value}
+
+#Health Indicator
+spring.cloud.config.server.health.enabled=false
+spring.cloud.config.server.health.repositories.{repo-name}.label={any label}
+
+
+Client:
+=======
+
+dependencies:
+-------------
+	    <dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-actuator</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-actuator-docs</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework.cloud</groupId>
+			<artifactId>spring-cloud-starter-config</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-web</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-security</artifactId>
+		</dependency>
+		<!-- for cloud bus -->
+        <dependency>
+			<groupId>org.springframework.cloud</groupId>
+			<artifactId>spring-cloud-starter-bus-amqp</artifactId>
+		</dependency>
+
+
+bootstrap.properties
+spring.cloud.config.uri: http://myconfigserver.com (or) https://user:secret@myconfig.mycompany.com
+spring.application.name=config-client
+spring.profiles.active=dev  #(comma separated list)
+spring.cloud.config.username=admin
+spring.cloud.config.password=admin
+management.security.enabled=false
+
+
+# MANAGEMENT HTTP SERVER
+management.address= # Network address that the management endpoints should bind to.
+management.context-path= # Management endpoint context-path. For instance `/actuator`
+management.port= # Management endpoint HTTP port. Uses the same port as the application by default. Configure a different port to use management-specific SSL.
+management.security.enabled=true # Enable security.
+management.security.roles=ACTUATOR,ACTRADMIN # Comma-separated list of roles that can access the management endpoint.
+
+
+# INFO CONTRIBUTORS (InfoContributorProperties)
+management.info.build.enabled=true # Enable build info.
+management.info.defaults.enabled=true # Enable default info contributors.
+management.info.env.enabled=true # Enable environment info.
+management.info.git.enabled=true # Enable git info.
+management.info.git.mode=simple # Mode to use to expose git information.
+
+# SECURITY (SecurityProperties)
+security.user.name=admin
+security.user.password=secret
+
+
+
+
