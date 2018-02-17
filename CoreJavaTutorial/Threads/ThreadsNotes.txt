@@ -1,0 +1,209 @@
+###### MultiThreading ######
+1. The ways to define a Thread
+    i. By extending Thread class
+    ii. By implementing Runnable interface
+2. Getting & Setting thread name
+3. Thread Priorities
+4. Methods to prevent thread execution
+   i. yield()
+   ii. join()
+   iii. sleep()
+5. Synchronization
+6. InterThread communication (wait,notify,notifyAll)
+7. Deadlock
+8. Deamon Threads
+9. MultiThreading enhancements
+    i. Thread Group
+    ii. Thread Local
+    iii. Executor Framework
+
+MultiTasking: Executing multiple tasks simulteniously , Ex: A class room student
+-------------
+    i. Process based MultiTasking : Executing sevaral tasks simoultaniously, where each task runs seperate independent program
+        Ex: At OS level not at programatic level
+    ii. Thread based MultiTasking : Executing sevaral task simulteniously, where each task seperate independent part of the same program
+        Ex: At programatic level
+Usage:
+------
+1. To reduce processor idle time
+2. To increase performance of the system (improve performance of the system)
+3. To reduce response time of the system
+Where we can use:
+-----------------
+1. To develop multimedia graphics
+2. To develop animations
+3. To develop games
+4. Web application servers
+
+Thread: A flow of execution is meant to be a thread, For every thread a seperate job is there
+
+1.The ways of defining a thread:  Extening Thread class and implementing Runnable interface
+------------------------------
+Thread Schedular: Is is the part of JVM,It is responsable to schedule threads. FCFS,RoundRobbin,ShortestJob First,( It is varies from JVM to JVM )
+----------------
+
+start() method in Thread class:
+1. Register this thread with thread scheduler
+2. Perform all other mandatory activities
+3. Invoke run method
+
+run() method can be overloaded
+
+Thread class start() method can be override, but it executes as a normal method
+
+If we call start() a already started thread,Then we will get IllegalThreadStateException (Runtime exception)
+
+MyThread -> extends Thread (start()) -> implements Runnable (run())
+MyRunnable -> implements Runnable (run())
+
+Thread Life Cycle:
+------------------
+
+1. New / Born State ( MyThread t=new MyThread() )
+2. Ready / Runnable (t.start())
+3. Running ( If thread scheduler allocates processor )
+4. Dead ( if run() completes )
+5. Running -> Ready (Thread.yield()) -> Ready
+6. Running -> Blocked or Waiting ( t1.join() ) -> Ready
+7. Running -> Sleep (Thread.sleep(1000)) -> Ready
+
+Thread class constructors:
+--------------------------
+
+new Thread()
+new Thread(Runnable r)
+new Thread(String name)
+new Thread(Runnable r,String name)
+new Thread(ThreadGroup g,String name)
+new Thread(ThreadGroup g,Runnable r)
+new Thread(ThreadGroup g,Runnable r,String name)
+new Thread(ThreadGroup g,Runnable r,String name,long stackSize)
+
+For every thread in java there is a name
+
+Thread.currentThread().getName()
+Thread.currentThread().setName(String s)
+
+If we not set any name , by default jvm will assign name to the thread
+
+Thread Priorities: MIN-PRIORITY(1),MAX-PRIORITY(10),NORM-PRIORITY(5) , IllegalArgumentException
+------------------
+1. Every thread in java has some priority
+2. Range of thread priorities 1-10
+3. Only main thread default priority is -> NORM -> 5
+4. New thread will inherit from parent thread priority if thread priority not set
+
+Thread Schedular will use priorities , it will give chance to max priority
+
+If 2 threads have same priority, that execution depends on thread Schedular implementation
+
+t.setPriority(int p)
+t.getPriority()
+
+Some operating systems won't provide proper support for thread priorities
+
+Prevent Thread Execution:
+-------------------------
+1. yield() : It causes to pause current executing thread, to give the chance for waiting threads 
+------------ of same priority,If there is no waiting thread or all waiting threads have low priority then 
+same thread can continue its execution
+If multiple threads are waiting with same priority, then which waiting thread will get the chance we cant expect
+it depends on thread scheduler
+
+public static void yield()
+
+Some platforms won't provide proper support for yield() method
+
+2. join() : If a thread wants to wait until some other thread completes its execution then 
+----------- we will use join()
+
+If t1 calls t2.join() then immediatley t1 enters into waiting state until t2 completes its task
+
+public final void join() throws InterruptedException
+public final void join(long milliseconds) throws InterruptedException
+public final void join(long milliseconds,int ns) throws InterruptedException
+
+DeadLock Situation: If a thread calls join() method on the same thread itself system will be program stuked
+-------------------
+public class ThreadJoinDemo {
+    public static void main(String[] args) throws InterruptedException {
+        Thread.currentThread().join(); // Main thread wants to wait until main thread completes
+    }
+}
+
+3. sleep(): If a thread dont want to perform any operation for particualar period of time then we should go for sleep()
+-----------
+
+public static native void sleep(long ms) throws InterruptedException (Checked exception)
+public static native void sleep(long ms,int ns) throws InterruptedException
+
+How a thread can interrupt another thread:
+------------------------------------------
+
+A thread can interrupt a sleeping or waiting thread by using intrupt() of thread class,
+It will wait until it got the chance to interrupt
+
+public void interrupt()
+
+t1.inerrupt()
+
+Synchronization:
+----------------
+*synchronized is the modifier applicable only for methods and blocks but not for classes & variables
+
+*If multiple threads are trying to operate simultaniously on same resource then there may be a chance of
+data-inconsistancy problem, To overcome this problem we should go for "synchronized" key word
+
+*If a method or block declared as synchronized then at time only one thread is allowed to 
+execute that method or block on the given object,So that data inconsistancy problem will be resolved
+
+*It increases wating time, and lead to performace problem
+
+*Internally syncronized concept is implemented using locks
+
+*Whenever we are using synchronized keyword then only lock concept will come into the picture
+
+*Aquiring locks and releasing locks handled by the jvm
+
+*While thread executing synchronized method on given object remaining threads are 
+not allowed to execute any synchronized methods, They have to  wait until it releases the lock
+
+*A non-synchronized area cab be accessed by any no. of threads simoultaniously
+
+*If a thread wants to execute static synchronized method , then that thread requires class level lock
+
+Every object in java has a unique lock 
+Every class in java has a unique lock like object
+
+*While a thread executing static synchronized method then the remaining threads not allowed to execute any static synchronized methods
+simultaniously of that class until it releases the class level lock
+
+*Object level lock is different and Class level lock is different
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
