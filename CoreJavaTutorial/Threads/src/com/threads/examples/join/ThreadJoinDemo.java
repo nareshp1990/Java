@@ -8,7 +8,7 @@ package com.threads.examples.join;
 public class ThreadJoinDemo {
 
     public static void main(String[] args) throws InterruptedException {
-        ChildThread thread=new ChildThread(Thread.currentThread());
+        /*ChildThread thread=new ChildThread(Thread.currentThread());
         thread.start();
         thread.interrupt();
         thread.join();
@@ -19,8 +19,11 @@ public class ThreadJoinDemo {
             }catch (InterruptedException ex){
                 ex.printStackTrace();
             }
-        }
+        }*/
 //         Thread.currentThread().join();
+
+        InterfaceImpl interfaceA=new InterfaceImpl();
+         interfaceA.run();
     }
 
 }

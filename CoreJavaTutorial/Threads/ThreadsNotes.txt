@@ -66,6 +66,7 @@ Thread Life Cycle:
 5. Running -> Ready (Thread.yield()) -> Ready
 6. Running -> Blocked or Waiting ( t1.join() ) -> Ready
 7. Running -> Sleep (Thread.sleep(1000)) -> Ready
+8. Running -> Waiting ( obj.wait() )
 
 Thread class constructors:
 --------------------------
@@ -179,6 +180,371 @@ Every class in java has a unique lock like object
 simultaniously of that class until it releases the class level lock
 
 *Object level lock is different and Class level lock is different
+
+synchronized Block: performace will be improved
+-------------------
+If very few lines of the code required Synchronization then it is not recomonded to declare entire method as synchronized
+we have to enclose those few lines of the code by using synchronized block
+
+1.To get lock of current object:
+--------------------------------
+synchronized(this){
+    -------
+    -------
+    -------
+    If a thread got lock of current object then only it is allowed to execute this area
+}
+2.To get lock of particualar object:
+------------------------------------
+synchronized(object){
+    -----
+    -----
+    -----
+}
+3.To get class level lock:
+-----------------------
+synchronized(ClassName.class){
+    -----
+    -----
+    -----
+}
+
+* Lock concept is applicable only for class & object
+
+* Race Condition:
+-----------------
+
+*If multiple threads operating simultaniously on same object then there may be a chance of data inconsistancy problem
+This is nothing but "race condition".
+to resolve this use synchronized keyword
+
+*If a thread wants to execute instance level synchronized method then object level lock is required,
+*If a thread wants to execute static synchronized method then class level lock is required
+
+*Thread can aquire multiple locks simultaniously (from different objects)
+
+Inter Thread Communication: [wait(),notify(),notifyAll()]
+---------------------------
+* 2 Threads can communicate with each other by using wait(),notify(),notifyAll()
+* The thread which is expecting updation, is responsible to call wait() , then that thread immediatley entered into waiting state
+* The thread which is performing updation then that thread has to call notify(),notifyAll() on required object(s)
+
+public final void wait​(long timeout) throws InterruptedException
+public final void wait​(long timeout,int nanos) throws InterruptedException
+public final void wait​() throws InterruptedException
+
+public final void notify​()
+public final void notifyAll​()
+
+"All these 3 methods resides in Object class":
+A thread can call these 3 methods on any java object(s), Thats why those 3 methods resides in Object class
+
+*To call wait(),notify(), notifyAll() methods on any object, Thread should be owner of taht object
+i.e., The thread should has lock of that object, i.e., the thread should be inside the synchronized area
+hence we can call these 3 methods only from synchronized area
+otherwise we will get runtime exception saying : IllegalMonitorStateException
+
+* If a thread calls wait() on a particualar object, Then that thread immediatley releases the lock of that object
+and entered into waiting state
+
+* If a thread calls notify() on a particualar object, Then that thread releases the lock of that object,but may not immdediatley
+
+* Except these 3 methods thread wont release locks any where
+
+*"Note": Every wait() throws InterruptedException which is Checked exception hence Whenever we are using wait()
+compulsury we should handle this InterruptedException either by try/catch or throws key word
+
+
+Producer Consumer Problem :
+---------------------------
+
+
+
+* notify() vs notifyAll():
+--------------------------
+
+We can use notify() to give the notification for only one waiting thread, if multiple threads are waiting
+then only one thread will by notified and the remaining threads have to wait for further notfications.
+
+Which thread will be notified we cannot expect it depends on jvm
+
+We can use notifyAll() to give the notification for all waiting threads of particual object
+
+synchronized(s){
+    ;
+    ;
+    ;
+    s2.wait(); // Wrong // RE: IllegalMonitorStateException
+    s.wait(); // Correct
+}
+
+Deadlock:
+---------
+*If two threads are waiting for eachother forever such type of infinite waiting is called Deadlock
+
+*Synchronized keyword is the only reason for deadlock Situation
+
+*Starvation:
+------------
+
+*Deadlock vs Starvation:
+------------------------
+Long waiting of a thread where waiting never ends is called deadlock,
+* where as long waiting of a thread where waiting ends at certain point is called Starvation.
+
+For ex. low priority thread has to wait until completing all high priority Threads, It may be long waiting but ends
+at certain point, which is nothing but Starvation.
+
+*Deamon Threads:
+---------------
+The thread which are executing in background is called deamon threads.
+
+for ex: garbage collector, attach listiner, etc...
+
+The main objective of deamon threads is to provide support for non-deamon threads(main thread)
+
+For ex: If main thread runs with low memory then JVM runs garbage collector to destroy useless objects, so that
+no. of bytes of free memory will be improved, with this free memory main thread can continue its execution
+
+U*seally deamon threads runs with low priority.
+
+public boolean isDeamon()
+public vois setDeamon(boolean b)
+
+*We can chance thread deamon nature before starting of a thread. otherwise we will get exception saying
+RE: IllegalThreadStateException
+
+*Default Nature of a thread:
+---------------------------
+
+By default main thread is always non-demaon, for all remaing threads deamon nature will be inherited
+from parent to child, i.e., If the parent thread is deamon then automatically child thread is also deamon.
+
+and if the parent thread is non-deamon then automatically child thread is also non deamon.
+
+
+* We cannot change main thread deamon nature, because main thread already started by jvm, we cannot set deamon for already started threads.
+
+* Whenever last non-deamon thread terminates automatically all deamon threads will be terminated. irrespective of their position.
+
+*Green Thread:
+--------------
+
+Java MultiThreading is implemented by 2 models.
+1. Green Thread Model : The thread wich is completely managed by JVM, which is nothing but green thread
+2. Native OS Model : The life cycle of thread managed by jvm with the help of underlining os support, is nothing but native os model
+
+* How to stop a thread: stop method is deprecated
+-----------------------
+        public void stop()
+
+* How to suspend & resume of a thread: deprecated methods
+--------------------------------------
+
+public void suspend() -> will go to suspended state
+public void resume()
+
+* Thread Group:
+---------------
+
+Based on functionality we can group threads into a single unit which is nothing but thread group.
+i.e., Thread Group contains a group of threads.
+In additions to threads , threadgroup can also contain sub thread groups.
+
+In java every thread group is the child group of system group.
+
+Main thread belongs to main thread group.
+
+ThreadGroup is a java class present in java.lang package and it is the direct child class of Object class
+
+new ThreadGroup(String name);
+new ThreadGroup(ThreadGroup tg,String name);
+
+  System thread group
+        ^
+        :
+        :
+        :
+        :
+   main thread group
+
+tg.setMaxPriority(int i);
+Threads in the thread group that have already higher priority won't be effected, 
+but for newly added threads this max priority will be applicable
+
+The problems with traditional synchronized keyword:
+---------------------------------------------------
+
+1. We are not having any flexibility to try for a lock without waiting
+2. There is no way to specify maximum waiting time for a thread to get lock, so that thread will wait 
+until getting the lock which may creates performance problems, which may casuse deadlock
+3. If a thread release a lock then which waiting thread will get that lock , we are not having any control on this
+4. There is no api to list out all wating threads for a lock
+5. The synchronized keyword compulsary we have to use either at method level or within the method
+and it is not posible to use across multiple methods
+
+To overcome these problems sun people introduce this package 
+
+* java.util.concurrent package: (Java 1.5 version)
+--------------------------------------------------
+
+It also provides several enhancements to the programmer to provide more control on concurrency
+
+Lock -> interface :
+-------------------
+*It is similar to implicit lock acquired by thread to execute synchronized method or synchronized block.
+*Lock implementations provide more extensive operations than traditional implicit locks
+
+Methods of Lock (I):
+--------------------
+
+1.void lock() : we can use this method to acquire a lock, If lock is already available then immdediatley current thread will get that lock
+,If the lock is not already available then it will wait until getting the lock. It is same as synchronized keyword.
+
+2.boolean tryLock(): To acquire the lock without waiting. If the lcok is available then the thread acquires that lock and returns true. If the lock is not available
+then this method returns false , and can its execution without waiting. In this case thread never be entred into waiting state
+
+if(l.tryLock()){
+    // safe implementation
+}else{
+    // Alternative operation
+}
+
+3.boolean tryLock(long value,TimeUnit unit):
+
+4.void lockInterruptibily(): acquires the lock if it is available and returns immediatley,If the lock is not available then
+it will wait. while waiting if the thread is interrupted then thread wont get the lock. 
+
+5. void unlock() throws IllegalMonitorStateException : to releases the lock. Curent thread must be owner of this lock, otherwise we will get IllegalMonitorStateException
+
+ReentrantLock -> implementation class
+
+ReentrantLock lock=new ReentrantLock();
+
+It means a thread can acquire same lock multiple times without any issue. 
+Internally ReentrantLock increments threads presonal counts whenever we call lock method. and 
+decrements count value whenever thread calls unlock method and lock will be released whenever count reaches 0.
+
+Constructors:
+-------------
+
+new ReentrantLock(); // Creates an instance of reentrant lock
+new ReentrantLock(boolean fairness); // Default value is false -> Creates an instance of reentrant lock with
+the given fairness polocy . If the fairness is true then longest waiting thread can acquire the lock if it is available.
+i.e., it follows FCFS policy. 
+If fairness is false then which waiting thread will get the chance we can't expect.
+
+Methods:
+--------
+int getHoldCount() : Returns no. of holds on this lock by current thread
+
+boolean isHeldByCurrentThread() : Returns true iff lock is hold by current thread
+
+int getQueueLength() : Returns no. of threads waiting for the lock
+
+Collection getQueuedThreads() : Returns a collection of threads which are waiting to get the lock
+
+boolean hasQueuedThtreads() :   Returns true if any thread waiting to get the lock
+
+boolean isLocked() : Return true if the lock is acquired by some thread
+
+boolean isFair() : Returns true if the fairness is set with true value 
+
+Thread getOwner() : Returns the thread which acquires the lock
+
+* Thread Pools (Executor Framework):
+------------------------------------
+
+* Creating a new thread for every job may create performace and memory problems. To overcome this we should go for 
+thread pool.
+* Thread pool is a pool of already created threads ready to do our job.
+* Java 1.5 ver. introduces thread pool Framework to implement thread Pools
+* Thread pool Framework also known as executor Framework
+
+Thread Pool Creation:
+---------------------
+
+* ExecutorService service=new Executors.newFixedThreadPool(int count);
+
+We can submit a runnable job by using submit() method.
+
+* service.submit(job);
+
+We can shutdown executro service by using shutdown() method
+
+* service.shutdown();
+
+* Callable(I) & Future :
+------------------------
+
+* In the case of runnable job thread wont return anything after completing the job.
+* If a thread is required to return some result after execution then we should go for Callable(I)
+Callable(I) contains only one method
+
+    public Object call()throws Exception
+
+If we submit a callble object to executor after completing the job thread returns an object of the type
+Future. i.e., Future object can ble used to retive the result from callble job.
+
+*  future.get()
+
+* Thread Local(C): To define thread specific local variables.
+------------------
+
+* It is used to define a thread scope
+
+*Note: Thread local class introduced in 1.2v and enhanced in 1.5v . Thread local can be associated with
+thread scope. Total code which is executed by the thread has accessed to the corresponding thread local variables.
+A thread can access its own local variables and can't access other threads local variables.
+Once thread entedred into dead state all its local variables are by default eligible for G.C.
+
+*Constructors:
+--------------
+
+ThreadLocal tl=new ThreadLocal(); // It creates a thread local variable.
+
+*Methods:
+---------
+
+Object get() : Returns the value of thread local variable associated with current thread.
+
+Object initialValue() : Returns initialValue of thread local variable associated with current thread
+
+The default implementation of this method returns null, To customize our own initial value we have to override this method.
+
+void set(Object newValue) : To set a new value.
+
+void remove() : To remove the value of thread local variable associated with current thread.
+
+* ParentThread thread local variable  default value not avaiable to the child thread. If we want to make it avaiable,
+the we should go for inheritable thread local variable.
+
+IneritableThreadLocal itl=new IneritableThreadLocal();
+
+* If we want to configure a seperate value for child thread we should override childValue() method in
+IneritableThreadLocal variable.
+
+public Object childValue(Object parentValue);
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
